@@ -1,177 +1,76 @@
 #include "Geode/cocos/base_nodes/CCNode.h"
+#include <Geode/modify/MenuLayer.hpp>
+#include <Geode/Geode.hpp>
+#include "Geode/loader/Log.hpp"
+
+#include "RmlUi/Core/Context.h"
 #include "RmlUi/Core/Core.h"
-#include "RmlUi/Core/Log.h"
-#define RMLUI_STATIC_LIB
-
-#include <string>
-#include <iostream>
-#include <thread>
-
+#include "RmlUi/Core/ElementDocument.h"
 #include <RmlUi/Core.h>
 #include <RmlUi/Core/RenderInterface.h>
-#include <Geode/Geode.hpp>
+#define RMLUI_STATIC_LIB
 
 #include "renderer/Renderer.h"
-#include "platform/Platform.h"
 #include "Backend.h"
-// #include <RmlUi/Shell.h>
+
+#include <string>
 
 using namespace geode::prelude;
 
-const int width = 1024;
-const int height = 768;
+auto getFrameSize() {
+    auto* director = cocos2d::CCDirector::sharedDirector();
+    const auto frameSize = director->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
 
-// $execute {
-//     log::debug("[$execute] LOADING");
-//     // std::thread t1(makeWindow);
-//     auto render_interface = std::make_unique<RenderInterface_GD>();
-//     Rml::SetRenderInterface(render_interface.get());
+    return frameSize;
+}
 
-
-//     // if (!Shell::Initialize())
-// 	// 	return -1;
-
-
-//     if (!Backend::Initialize("Demo Sample", width, height, true))
-// 	{
-// 		// Shell::Shutdown();
-// 		return;
-// 	}
-
-//     Rml::SetSystemInterface(Backend::GetSystemInterface());
-// 	Rml::SetRenderInterface(Backend::GetRenderInterface());
-
-//     Rml::Initialise();
-
-//     // Rml::Context* context = Rml::CreateContext("main", Rml::Vector2i(width, height));
-// 	// if (!context)
-// 	// {
-// 	// 	Rml::Shutdown();
-// 	// 	Backend::Shutdown();
-// 	// 	// Shell::Shutdown();
-// 	// 	return;
-// 	// }
-
-// }
-
-// $on_mod(Loaded) {
-//     log::debug("[$execute] LOADING");
-//     // std::thread t1(makeWindow);
-//     auto render_interface = std::make_unique<RenderInterface_GD>();
-//     Rml::SetRenderInterface(render_interface.get());
-
-//     auto system_interface = std::make_unique<SystemInterface_GD>();
-//     Rml::SetSystemInterface(system_interface.get());
-
-//     // if (!Shell::Initialize())
-// 	// 	return -1;
-
-// 	log::debug("COCK A");
-//     if (!Backend::Initialize("Demo Sample", width, height, true))
-// 	{
-// 		// Shell::Shutdown();
-// 		log::debug("COCK B");
-// 		return;
-// 	}
-	
-
-// 	log::debug("COCK C {}", (uint64_t)data.get());
-//     // Rml::SetSystemInterface(Backend::GetSystemInterface());
-// 	// Rml::SetRenderInterface(Backend::GetRenderInterface());
-// 	log::debug("COCK D");
-
-//     auto sdoj = Rml::Initialise();
-// 	log::debug("COCK E {}", sdoj);
-// 	Rml::Log::Message(Rml::Log::LT_WARNING, "Exoplod9ng Cock");
-
-//     Rml::Context* context = Rml::CreateContext("main", Rml::Vector2i(width, height));
-// 	log::debug("vajines {} {}", (uint64_t)context, context == nullptr);
-	
-// 	if (context == nullptr)
-// 	{
-// 		log::debug("COCK F");
-// 		Rml::Shutdown();
-// 		log::debug("COCK G");
-// 		Backend::Shutdown();
-// 		log::debug("COCK H");
-// 		// Shell::Shutdown();
-// 		return;
-// 	}
-
-//     bool running = true;
-//     while(running) {
-//         // running = Backend::ProcessEvents(context, &Shell::ProcessKeyDownShortcuts, true);
-// 		context->Update();
-
-// 		Backend::BeginFrame();
-// 		context->Render();
-// 		Backend::PresentFrame();
-//     }
-
-//     Rml::Shutdown();
-
-// 	Backend::Shutdown();
-
-// 	log::debug("COCK I");
-// }
-
-
-
-
-
-class TheNode : public cocos2d::CCNode {
+// currently u can only have 1 of these nodes
+// it would be cool in the future to be able to have more than 1 if possible
+class RmlUINode : public cocos2d::CCNode {
 public:
     Rml::Context* context;
+    Rml::ElementDocument* document;
 
-    TheNode() {}
+    RmlUINode() {}
 
     bool init() {
 		if (!CCNode::init()) {
             return false;
         }
 
-        log::debug("[$execute] LOADING");
-        // std::thread t1(makeWindow);
-        auto render_interface = std::make_unique<RenderInterface_GD>();
-        Rml::SetRenderInterface(render_interface.get());
+        Backend::Initialize();
 
-        auto system_interface = std::make_unique<SystemInterface_GD>();
-        Rml::SetSystemInterface(system_interface.get());
+        Rml::SetRenderInterface(Backend::GetRenderInterface());
+        Rml::SetSystemInterface(Backend::GetSystemInterface());
 
-        // if (!Shell::Initialize())
-        // 	return -1;
+        Rml::Initialise();
 
-        log::debug("COCK A");
-        if (!Backend::Initialize("Demo Sample", width, height, true))
-        {
-            // Shell::Shutdown();
-            log::debug("COCK B");
-            return false;
-        }
-        
+        auto frameSize = getFrameSize();
 
-        // log::debug("COCK C {}", (uint64_t)data.get());
-        // Rml::SetSystemInterface(Backend::GetSystemInterface());
-        // Rml::SetRenderInterface(Backend::GetRenderInterface());
-        log::debug("COCK D");
+        // not sure if this is necessary as examples dont do it, but viewport_width and viewport_height
+        // members are not set in any other place
+        Backend::GetRenderInterface()->SetViewport(frameSize.width, frameSize.height);
 
-        auto sdoj = Rml::Initialise();
-        log::debug("COCK E {}", sdoj);
-        Rml::Log::Message(Rml::Log::LT_WARNING, "Exoplod9ng Cock");
-
-        context = Rml::CreateContext("main", Rml::Vector2i(width, height));
-        log::debug("vajines {} {}", (uint64_t)context, context == nullptr);
-        
+        context = Rml::CreateContext("main", Rml::Vector2i(frameSize.width, frameSize.height));
         if (context == nullptr)
         {
-            log::debug("COCK F");
-            Rml::Shutdown();
-            log::debug("COCK G");
-            Backend::Shutdown();
-            log::debug("COCK H");
-            // Shell::Shutdown();
+            log::error("Failed to create rml context");
             return false;
         }
+
+        // test resources
+        auto fontPath = Mod::get()->getResourcesDir() /  "Roboto.ttf";
+        Rml::LoadFontFace(fontPath.string());
+
+        auto docPath = Mod::get()->getResourcesDir() /  "test.rml";
+        document = context->LoadDocument(docPath.string());
+
+    	if (!document) {
+            log::error("Failed to load rml document");
+		    return false;
+        }
+
+        document->Show();
 
         scheduleUpdate();
 
@@ -179,15 +78,19 @@ public:
     }
 
     void draw() {
-        // context->Update();
-
+        context->Update();
         Backend::BeginFrame();
         context->Render();
         Backend::PresentFrame();
     }
+
+    ~RmlUINode() {
+        Backend::Shutdown();
+        Rml::Shutdown();
+    }
 	
-	static TheNode* create() {
-        auto node = new TheNode;
+	static RmlUINode* create() {
+        auto node = new RmlUINode;
         if (!node->init()) {
             CC_SAFE_DELETE(node);
             return nullptr;
@@ -198,7 +101,6 @@ public:
 };
 
 
-#include <Geode/modify/MenuLayer.hpp>
 class $modify(MyMenuLayer, MenuLayer) {
 
 	bool init() {
@@ -206,14 +108,13 @@ class $modify(MyMenuLayer, MenuLayer) {
 			return false;
 		}
 
-        auto node = TheNode::create();
+        auto node = RmlUINode::create();
+        node->setID("rmlui-test-node");
 
         this->addChild(node);
 
 		return true;
 	}
-
-	void onMyButton(CCObject*) {
-		FLAlertLayer::create("Geode", "Hello from my custom mod!", "OK")->show();
-	}
 };
+
+

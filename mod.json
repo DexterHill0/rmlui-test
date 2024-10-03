@@ -1,5 +1,5 @@
 {
-    "geode": "3.1.1",
+    "geode": "3.8.1",
     "gd": {
         "win": "2.206",
         "android": "2.206",
@@ -10,5 +10,8 @@
     "id": "dexterhill0.rmlui-test",
     "name": "rmlui-test",
     "developer": "DexterHill0",
-    "description": ""
+    "description": "",
+    "resources": {
+        "files": ["resources/Roboto.ttf", "resources/test.rml"]
+    }
 }

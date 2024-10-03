@@ -10,6 +10,6 @@
 SystemInterface_GD::SystemInterface_GD() {}
 
 bool SystemInterface_GD::LogMessage(Rml::Log::Type type, const Rml::String& message) {
-    geode::log::debug("[AAAAAAAAAA] {}", message);
+    geode::log::debug("[SystemInterface] {}", message);
         return true;
 }
