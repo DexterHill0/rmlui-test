@@ -120,11 +120,11 @@ target_link_libraries(${PROJECT_NAME} freetype)
 CPMAddPackage(
     NAME rmlui
     GITHUB_REPOSITORY mikke89/RmlUi
-    GIT_TAG 5.1
+    GIT_TAG 6.0
     OPTIONS "RMLUI_STATIC_LIB" "FREETYPE_LIBRARY ${freetype_BINARY_DIR}" "FREETYPE_INCLUDE_DIRS ${freetype_SOURCE_DIR}"
 )
 
-target_link_libraries(${PROJECT_NAME} RmlUi::Core RmlUi::Debugger shell)
+target_link_libraries(${PROJECT_NAME} RmlUi::Core RmlUi::Debugger)
 target_include_directories(${PROJECT_NAME} PUBLIC ${rmlui_SOURCE_DIR}/Include ${rmlui_SOURCE_DIR}/Backends)
 
 set(BACKEND RmlUi_Backend_Win32_GL2)

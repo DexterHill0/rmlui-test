@@ -9,11 +9,11 @@
 #include <string>
 
 
-class SystemInterface_GD : public SystemInterface_Win32 {
-public:
-	SystemInterface_GD();
+// class SystemInterface_GD : public SystemInterface_Win32 {
+// public:
+// 	SystemInterface_GD();
 
-    virtual bool LogMessage(Rml::Log::Type type, const Rml::String& message);
-};
+//     virtual bool LogMessage(Rml::Log::Type type, const Rml::String& message);
+// };
 
 #endif

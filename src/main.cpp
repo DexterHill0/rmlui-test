@@ -37,15 +37,16 @@ public:
 		if (!CCNode::init()) {
             return false;
         }
+        
+        auto frameSize = getFrameSize();
 
-        Backend::Initialize();
+        Backend::Initialize(frameSize.width, frameSize.height);
 
         Rml::SetRenderInterface(Backend::GetRenderInterface());
-        Rml::SetSystemInterface(Backend::GetSystemInterface());
+        // Rml::SetSystemInterface(Backend::GetSystemInterface());
 
         Rml::Initialise();
 
-        auto frameSize = getFrameSize();
 
         // not sure if this is necessary as examples dont do it, but viewport_width and viewport_height
         // members are not set in any other place
@@ -78,10 +79,22 @@ public:
     }
 
     void draw() {
+        // GLint current_fbo;
+        // glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
+        // log::debug("FBO before render: {}", current_fbo);
+
         context->Update();
         Backend::BeginFrame();
         context->Render();
+
+        // glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
+        // log::debug("FBO in render: {}", current_fbo);
+
         Backend::PresentFrame();
+
+        // glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
+        // log::debug("FBO after render: {}", current_fbo);
+
     }
 
     ~RmlUINode() {

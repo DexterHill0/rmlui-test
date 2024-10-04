@@ -7,12 +7,17 @@
 // #include <RmlUi/Core/SystemInterface.h>
 #include <RmlUi/Core/Types.h>
 
+#include "RmlUi/Core/SystemInterface.h"
 #include "renderer/Renderer.h"
+#include <RmlUi_Platform_Win32.h>
 #include "platform/Platform.h"
 
 struct BackendData {
-	SystemInterface_GD system_interface;
+	// SystemInterface_Win32 system_interface;
 	RenderInterface_GD render_interface;
+
+    GLuint rmluiFbo;
+    GLuint gdFbo;
 
 	bool context_dimensions_dirty = true;
 	Rml::Vector2i window_dimensions;
@@ -27,12 +32,12 @@ static Rml::UniquePtr<BackendData> data;
 namespace Backend {
 
 // Initializes the backend, including the custom system and render interfaces, and opens a window for rendering the RmlUi context.
-void Initialize();
+void Initialize(float, float);
 // Closes the window and release all resources owned by the backend, including the system and render interfaces.
 void Shutdown();
 
 // Returns a pointer to the custom system interface which should be provided to RmlUi.
-SystemInterface_GD* GetSystemInterface();
+// Rml::SystemInterface* GetSystemInterface();
 // Returns a pointer to the custom render interface which should be provided to RmlUi.
 RenderInterface_GD* GetRenderInterface();
 
