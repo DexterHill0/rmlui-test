@@ -10,7 +10,6 @@
 #include "RmlUi/Core/SystemInterface.h"
 #include "renderer/Renderer.h"
 #include <RmlUi_Platform_Win32.h>
-#include "platform/Platform.h"
 
 struct BackendData {
 	// SystemInterface_Win32 system_interface;
@@ -18,6 +17,8 @@ struct BackendData {
 
     GLuint rmluiFbo;
     GLuint gdFbo;
+
+    // geode::Ref<cocos2d::CCGLProgram> shader;
 
 	bool context_dimensions_dirty = true;
 	Rml::Vector2i window_dimensions;

@@ -42,12 +42,7 @@ void RenderInterface_GD::BeginFrame()
 
 	RMLUI_ASSERT(viewport_width >= 0 && viewport_height >= 0);
 
-    // GLint previous_shader_program;
-    // glGetIntegerv(GL_CURRENT_PROGRAM, &previous_shader_program);  // Save the current shader program
-    // shader_program = previous_shader_program;
-    // glUseProgram(0);
-
-    auto* shader = cocos2d::CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor);
+    auto shader = cocos2d::CCShaderCache::sharedShaderCache()->programForKey("rmlui_shader");
 	shader->use();
 	shader->setUniformsForBuiltins();
 
@@ -58,7 +53,7 @@ void RenderInterface_GD::BeginFrame()
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);  // Disable face culling for 2D rendering
+    glDisable(GL_CULL_FACE); 
 
     Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0, (float)viewport_width, (float)viewport_height, 0, -10000, 10000);
     glMatrixMode(GL_TEXTURE);
@@ -66,11 +61,8 @@ void RenderInterface_GD::BeginFrame()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity(); // < i add this but it do nothing
+    glLoadIdentity();
     glLoadMatrixf(projection.data());
-    // glOrtho(0.0f, (float)viewport_width, (float)viewport_height, 0.0f, -1.0f, 1.0f);
-    
-    // glDisable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -113,14 +105,8 @@ void RenderInterface_GD::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml:
 	const int* indices = geometry->indices.data();
 	const int num_indices = (int)geometry->indices.size();
 
-    // glDisable(GL_TEXTURE_2D);
-
 	glPushMatrix();
 	glTranslatef(translation.x, translation.y, 0);
-
-    // 	glVertexPointer(2, GL_FLOAT, sizeof(Rml::Vertex), &vertices[0].position);
-	// glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(Rml::Vertex), &vertices[0].colour);
-
 
     glEnableVertexAttribArray(cocos2d::kCCVertexAttrib_Position);
 	glVertexAttribPointer(cocos2d::kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, sizeof(Rml::Vertex), &vertices[0].position);
@@ -141,7 +127,6 @@ void RenderInterface_GD::RenderGeometry(Rml::CompiledGeometryHandle handle, Rml:
 			glBindTexture(GL_TEXTURE_2D, (GLuint)texture);
 
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		// glTexCoordPointer(2, GL_FLOAT, sizeof(Rml::Vertex), &vertices[0].tex_coord);
 
         glEnableVertexAttribArray(cocos2d::kCCVertexAttrib_TexCoords);
 	    glVertexAttribPointer(cocos2d::kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, sizeof(Rml::Vertex), &vertices[0].tex_coord);
@@ -233,27 +218,8 @@ void RenderInterface_GD::RenderToClipMask(Rml::ClipMaskOperation operation, Rml:
 	glStencilFunc(GL_EQUAL, stencil_test_value, GLuint(-1));
 }
 
-cocos2d::CCPoint frameToCocos(int x, int y) {
-	auto* director = cocos2d::CCDirector::sharedDirector();
-	const auto frameSize = director->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
-	const auto winSize = director->getWinSize();
-
-	return {
-		x / frameSize.width * winSize.width,
-		(1.f - y / frameSize.height) * winSize.height
-	};
-}
-
-
 void RenderInterface_GD::SetScissorRegion(Rml::Rectanglei region)
 {
-    // i took this one from mats imgui cocos
-    // dont know if this is doing the correct things
-    // const auto orig = frameToCocos(x, y);
-    // const auto end = frameToCocos(width, height);
-    // cocos2d::CCDirector::sharedDirector()->getOpenGLView()->setScissorInPoints(orig.x, end.y, end.x - orig.x, orig.y - end.y);
-
-    // this is the original code
     glScissor(region.Left(), viewport_height - region.Bottom(), region.Width(), region.Height());
 }
 

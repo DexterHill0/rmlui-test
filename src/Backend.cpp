@@ -1,14 +1,18 @@
 
 
-#include "./Backend.h"
 #include <RmlUi/Core/Context.h>
 #include <RmlUi/Core/Core.h>
 #include <RmlUi/Core/Input.h>
 #include <RmlUi/Core/Profiling.h>
 #include <Geode/Geode.hpp>
+#include "Geode/cocos/shaders/CCGLProgram.h"
+#include "Geode/cocos/shaders/CCShaderCache.h"
+#include "Geode/loader/Log.hpp"
 
-#include "Backend.h"
+#include "./Backend.h"
 
+#include "./renderer/shaders/PositionTextureColor.vert.h"
+#include "./renderer/shaders/PositionTextureColor.frag.h"
 
 void Backend::Initialize(float viewWidth, float viewHeight)
 {
@@ -18,8 +22,6 @@ void Backend::Initialize(float viewWidth, float viewHeight)
 
     data->window_dimensions.x = viewWidth;
     data->window_dimensions.y = viewHeight;
-
-    geode::log::debug("VW {}, VH {}", viewWidth, viewHeight);
 
     GLuint rmlui_fbo, rmlui_color_texture, rmlui_depth_buffer;
 
@@ -57,7 +59,7 @@ void Backend::Initialize(float viewWidth, float viewHeight)
 
     // Check if the framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "Framebuffer is incomplete!" << std::endl;
+        geode::log::error("Framebuffer is incomplete!");
     }
 
     // Unbind the framebuffer for now
@@ -68,11 +70,21 @@ void Backend::Initialize(float viewWidth, float viewHeight)
 
     data->rmluiFbo = rmlui_fbo;
     data->gdFbo = gdFbo;
+
+    auto program = new cocos2d::CCGLProgram;
+    program->initWithVertexShaderByteArray(POS_TEX_COL_VERT, POS_TEX_COL_FRAG);
+
+    program->retain();
+
+    cocos2d::CCShaderCache::sharedShaderCache()->addProgram(program, "rmlui_shader");
 }
 
 void Backend::Shutdown()
 {
 	RMLUI_ASSERT(data);
+
+    auto shader = cocos2d::CCShaderCache::sharedShaderCache()->programForKey("rmlui_shader");
+    shader->release();
 
 	data.reset();
 }

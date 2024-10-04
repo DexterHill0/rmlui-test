@@ -5,7 +5,7 @@
                 font-family: "Roboto";
                 font-weight: normal;
                 font-style: normal;
-                font-size: 200px;
+                font-size: 100px;
                 color: white;
             }
         </style>
