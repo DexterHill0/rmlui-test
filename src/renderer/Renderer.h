@@ -2,6 +2,7 @@
 #define RMLUI_BACKENDS_RENDERER_GD
 
 #include <RmlUi/Core/RenderInterface.h>
+#include <unordered_map>
 
 #include "./Shader.h"
 
@@ -71,6 +72,8 @@ private:
     GLint rmluiVao;
 
     Rml::TextureHandle rmluiTexture;
+
+    std::unordered_map<GLuint, std::string> textureIdMap;
 };
 
 #endif
