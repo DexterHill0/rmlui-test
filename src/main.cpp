@@ -8,6 +8,7 @@
 #include "RmlUi/Core/ElementDocument.h"
 #include <RmlUi/Core.h>
 #include <RmlUi/Core/RenderInterface.h>
+#include <RmlUi/Core/FileInterface.h>
 #define RMLUI_STATIC_LIB
 
 #include "renderer/Renderer.h"
@@ -34,19 +35,25 @@ public:
     RmlUINode() {}
 
     bool init() {
-		if (!CCNode::init()) {
+        if (!CCNode::init()) {
             return false;
         }
-        
+
         auto frameSize = getFrameSize();
 
         Backend::Initialize(frameSize.width, frameSize.height);
 
         Rml::SetRenderInterface(Backend::GetRenderInterface());
-        // Rml::SetSystemInterface(Backend::GetSystemInterface());
+        // Rml::SetFileInterface(Backend::GetFileInterface());
+
+        // geode::log::debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TEST {}", (void*)Backend::GetFileInterface());
+        // // Rml::SetSystemInterface(Backend::GetSystemInterface());
 
         Rml::Initialise();
 
+        if (!Backend::GetRenderInterface()->Initialise()) {
+            return false;
+        }
 
         // not sure if this is necessary as examples dont do it, but viewport_width and viewport_height
         // members are not set in any other place
@@ -83,9 +90,9 @@ public:
         // glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
         // log::debug("FBO before render: {}", current_fbo);
 
-        context->Update();
+        // context->Update();
         Backend::BeginFrame();
-        context->Render();
+        // context->Render();
 
         // glGetIntegerv(GL_FRAMEBUFFER_BINDING, &current_fbo);
         // log::debug("FBO in render: {}", current_fbo);

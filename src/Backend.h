@@ -7,16 +7,17 @@
 // #include <RmlUi/Core/SystemInterface.h>
 #include <RmlUi/Core/Types.h>
 
-#include "RmlUi/Core/SystemInterface.h"
 #include "renderer/Renderer.h"
+// #include "file/File.h"
 #include <RmlUi_Platform_Win32.h>
 
 struct BackendData {
 	// SystemInterface_Win32 system_interface;
+    // FileInterface_GD file_interface;
 	RenderInterface_GD render_interface;
 
-    GLuint rmluiFbo;
-    GLuint gdFbo;
+    // GLuint rmluiFbo;
+    // GLuint gdFbo;
 
     // geode::Ref<cocos2d::CCGLProgram> shader;
 
@@ -37,9 +38,8 @@ void Initialize(float, float);
 // Closes the window and release all resources owned by the backend, including the system and render interfaces.
 void Shutdown();
 
-// Returns a pointer to the custom system interface which should be provided to RmlUi.
 // Rml::SystemInterface* GetSystemInterface();
-// Returns a pointer to the custom render interface which should be provided to RmlUi.
+// FileInterface_GD* GetFileInterface();
 RenderInterface_GD* GetRenderInterface();
 
 // Polls and processes events from the current platform, and applies any relevant events to the provided RmlUi context and the key down callback.

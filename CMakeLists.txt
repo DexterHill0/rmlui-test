@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} SHARED
     src/main.cpp
     src/Backend.cpp
     src/renderer/Renderer.cpp
+    src/renderer/Shader.cpp
     src/platform/Platform.cpp
 )
 
@@ -127,8 +128,8 @@ CPMAddPackage(
 target_link_libraries(${PROJECT_NAME} RmlUi::Core RmlUi::Debugger)
 target_include_directories(${PROJECT_NAME} PUBLIC ${rmlui_SOURCE_DIR}/Include ${rmlui_SOURCE_DIR}/Backends)
 
-set(BACKEND RmlUi_Backend_Win32_GL2)
-# target_sources(${PROJECT_NAME} PUBLIC ${rmlui_SOURCE_DIR}/Backends/${BACKEND}.cpp)
+# set(BACKEND RmlUi_Backend_Win32_GL2)
+# target_sources(${PROJECT_NAME} PUBLIC ${rmlui_SOURCE_DIR}/Source/Core/FileInterfaceDefault.cpp)
 
 # set(SHARED_LIBS_DIR ${CMAKE_BINARY_DIR}/shared)
 # file(MAKE_DIRECTORY ${SHARED_LIBS_DIR})

@@ -12,6 +12,10 @@
     "developer": "DexterHill0",
     "description": "",
     "resources": {
-        "files": ["resources/Roboto.ttf", "resources/test.rml"]
+        "files": [
+            "resources/Roboto.ttf",
+            "resources/test.rml",
+            "resources/container.tga"
+        ]
     }
 }

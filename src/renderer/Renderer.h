@@ -3,9 +3,13 @@
 
 #include <RmlUi/Core/RenderInterface.h>
 
+#include "./Shader.h"
+
 class RenderInterface_GD : public Rml::RenderInterface {
 public:
 	RenderInterface_GD();
+
+    bool Initialise();
 
 	// The viewport should be updated whenever the window size changes.
 	void SetViewport(int viewport_width, int viewport_height);
@@ -42,17 +46,31 @@ public:
 	// Can be passed to RenderGeometry() to enable texture rendering without changing the bound texture.
 	static const Rml::TextureHandle TextureEnableWithoutBinding = Rml::TextureHandle(-1);
 
-private:
+private: 
+    Shader* testShader;
+
     struct GeometryView {
 		Rml::Span<const Rml::Vertex> vertices;
 		Rml::Span<const int> indices;
 	};
 
-	int viewport_width = 0;
+    struct GdState {
+        GLint shaderProgram = 0;
+        GLint vao = 0;
+        GLint texture = 0;
+    };
+    GdState gdState = {};
+
+    void saveGdState();
+    void restoreGdState();
+
+    int viewport_width = 0;
 	int viewport_height = 0;
 	bool transform_enabled = false;
 
-    int shader_program = 0;
+    GLint rmluiVao;
+
+    Rml::TextureHandle rmluiTexture;
 };
 
 #endif
