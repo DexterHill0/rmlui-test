@@ -12,24 +12,23 @@
 #include <RmlUi_Platform_Win32.h>
 
 struct BackendData {
-	// SystemInterface_Win32 system_interface;
+    // SystemInterface_Win32 system_interface;
     // FileInterface_GD file_interface;
-	RenderInterface_GD render_interface;
+    RenderInterface_GD render_interface;
 
     // GLuint rmluiFbo;
     // GLuint gdFbo;
 
     // geode::Ref<cocos2d::CCGLProgram> shader;
 
-	bool context_dimensions_dirty = true;
-	Rml::Vector2i window_dimensions;
-	bool running = true;
+    bool context_dimensions_dirty = true;
+    Rml::Vector2i window_dimensions;
+    bool running = true;
 };
 
 // this global is probably bad if i want more than 1 window maybe idk
 // or if i wanted threads
 static Rml::UniquePtr<BackendData> data;
-
 
 namespace Backend {
 

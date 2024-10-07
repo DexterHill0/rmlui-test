@@ -1,14 +1,17 @@
 #include "./Shader.h"
-#include "Geode/loader/Log.hpp"
+
 #include <optional>
+
+#include "Geode/loader/Log.hpp"
 
 Shader::Shader() {}
 
 Shader::~Shader() {
-    glDeleteProgram(programId);
+    remove();
 }
 
-std::optional<Shader*> Shader::compile(const char* vertex, const char* fragment) {
+std::optional<Shader*>
+Shader::compile(const char* vertex, const char* fragment) {
     Shader* shader = new Shader;
 
     int success;
@@ -21,8 +24,7 @@ std::optional<Shader*> Shader::compile(const char* vertex, const char* fragment)
     glCompileShader(vertexShader);
 
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
+    if (!success) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         geode::log::error("[SHADER_VERTEX_COMPILATION_FAILED] {}", infoLog);
 
@@ -36,8 +38,7 @@ std::optional<Shader*> Shader::compile(const char* vertex, const char* fragment)
     glCompileShader(fragmentShader);
 
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
+    if (!success) {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
         geode::log::error("[SHADER_FRAGMENT_COMPILATION_FAILED] {}", infoLog);
 
@@ -55,7 +56,7 @@ std::optional<Shader*> Shader::compile(const char* vertex, const char* fragment)
     glLinkProgram(shaderProgram);
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if(!success) {
+    if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
         geode::log::error("[SHADER_LINK_FAILED] {}", infoLog);
 
@@ -69,17 +70,26 @@ std::optional<Shader*> Shader::compile(const char* vertex, const char* fragment)
 }
 
 void Shader::use() {
-    // geode::log::debug("HERE {}", programId);
     glUseProgram(programId);
 }
 
+void Shader::remove() {
+    glDeleteProgram(programId);
+}
 
 GLint Shader::getUniformLocation(const char* name) {
     // assume uniforms have been cached already
     return uniforms[name];
 }
 
-void Shader::setFloat4(const char *name, float a, float b, float c, float d) {
-    // geode::log::debug("ID {}", getUniformLocation(name));
+void Shader::setFloat4(const char* name, float a, float b, float c, float d) {
     glUniform4f(getUniformLocation(name), a, b, c, d);
+}
+
+void Shader::setFloatMat4(const char* name, float* mat, int count) {
+    glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, mat);
+}
+
+void Shader::setFloatVec2(const char* name, float* mat, int count) {
+    glUniform2fv(getUniformLocation(name), count, mat);
 }
