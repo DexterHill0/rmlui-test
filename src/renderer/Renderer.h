@@ -59,6 +59,7 @@ private:
         GLint shaderProgram = 0;
         GLint vao = 0;
         GLint texture = 0;
+        GLint fbo = 0;
     };
     GdState gdState = {};
 
@@ -70,6 +71,7 @@ private:
 	bool transform_enabled = false;
 
     GLint rmluiVao;
+    GLint rmluiFbo;
 
     Rml::TextureHandle rmluiTexture;
 

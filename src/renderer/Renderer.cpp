@@ -39,12 +39,14 @@ void RenderInterface_GD::saveGdState() {
     glGetIntegerv(GL_CURRENT_PROGRAM, &gdState.shaderProgram);
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &gdState.vao);
     glGetIntegerv(GL_TEXTURE_2D, &gdState.texture);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &gdState.fbo);
 }
 
 void RenderInterface_GD::restoreGdState() {
     glUseProgram(gdState.shaderProgram);
     glBindVertexArray(gdState.vao);
     glBindTexture(GL_TEXTURE_2D, gdState.texture); 
+    glBindFramebuffer(GL_FRAMEBUFFER, gdState.fbo);
 
     glViewport(0, 0, viewport_width, viewport_height);
 }
@@ -60,6 +62,22 @@ RenderInterface_GD::RenderInterface_GD() {}
 
 bool RenderInterface_GD::Initialise() {
     saveGdState();
+
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // create a color attachment texture
+    unsigned int textureColorbuffer;
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewport_width, viewport_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+    rmluiFbo = framebuffer;
+
+    glDeleteFramebuffers(1, &framebuffer);  
 
     auto shader = Test::compile();
     if (!shader.has_value()) return false;
@@ -125,7 +143,14 @@ void RenderInterface_GD::BeginFrame()
 
     saveGdState();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, rmluiFbo);
+
     glViewport(0, 0, viewport_width, viewport_height);
+
+	glClearStencil(0);
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     // geode::log::debug("TEST SHADER {}", testShader.programId);
 
@@ -145,11 +170,12 @@ void RenderInterface_GD::BeginFrame()
 }
 
 void RenderInterface_GD::EndFrame() {
-    // glBindVertexArray(0);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, rmluiFbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gdState.fbo); 
+
+    glBlitFramebuffer(0, 0, viewport_width, viewport_height, 0, 0, viewport_width, viewport_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
     restoreGdState();
-
-    // cocos2d::CCEGLView::sharedOpenGLView()->swapBuffers();
 }
 
 void RenderInterface_GD::FinaliseFrame() {
@@ -157,9 +183,6 @@ void RenderInterface_GD::FinaliseFrame() {
 
 void RenderInterface_GD::Clear()
 {
-	glClearStencil(0);
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 Rml::CompiledGeometryHandle RenderInterface_GD::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices)
@@ -221,7 +244,7 @@ void RenderInterface_GD::ReleaseTexture(Rml::TextureHandle texture_handle)
 {
     auto name = textureIdMap[texture_handle].c_str();
 
-    geode::log::debug("[RenderInterface_GD::ReleaseTexture] removing texture {}", name);
+    // geode::log::debug("[RenderInterface_GD::ReleaseTexture] removing texture {}", name);
 
     cocos2d::CCTextureCache::sharedTextureCache()->removeTextureForKey(name);
 }
@@ -231,7 +254,7 @@ Rml::TextureHandle RenderInterface_GD::LoadTexture(Rml::Vector2i& texture_dimens
     auto name = source.c_str();
     geode::Ref<cocos2d::CCTexture2D> texture = cocos2d::CCTextureCache::sharedTextureCache()->addImage(name, false);
 
-    geode::log::debug("[RenderInterface_GD::LoadTexture] loading texture {}", source);
+    // geode::log::debug("[RenderInterface_GD::LoadTexture] loading texture {}", source);
 
     textureIdMap[texture->getName()] = source;
 
